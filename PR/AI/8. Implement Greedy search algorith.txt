@@ -1,0 +1,35 @@
+8. Implement Greedy search algorithm for any of the following application:
+ • Dijkstra’s Minimum Spanning Tree Algorithm
+
+
+
+# Dijkstra's algorithm implementation without using libraries
+def dijkstra(graph, source):
+    vertices = set(graph.keys())
+    distance = {vertex: float('inf') for vertex in vertices}
+    distance[source] = 0
+    visited = set()
+
+    while visited != vertices:
+        current = min(vertices - visited, key=lambda vertex: distance[vertex])
+        visited.add(current)
+
+        for neighbor, weight in graph[current].items():
+            if distance[current] + weight < distance[neighbor]:
+                distance[neighbor] = distance[current] + weight
+
+    return distance
+
+# Example usage
+graph = {
+    'A': {'B': 6, 'C': 2},
+    'B': {'A': 6, 'C': 3, 'D': 1},
+    'C': {'A': 2, 'B': 3, 'D': 5},
+    'D': {'B': 1, 'C': 5}
+}
+source_node = 'A'
+
+shortest_paths = dijkstra(graph, source_node)
+print(f"Shortest paths from node {source_node}:")
+for node, dist in shortest_paths.items():
+    print(f"To {node} : {dist}")

@@ -1,0 +1,42 @@
+Problem Statement: -8
+Develop a student database to efficiently manage and retrieve student records (Student id,
+Student Name, Class, address, grades, and enrolment details, subject name, attendance.
+● Create Views to provide summarized insights into student performance and
+attendance. (Consider the attributes which shows attendance of students while
+creating view)
+● Create Sequences to generate unique student IDs.
+● Create an index on a table using student name.
+
+
+-- Creating the database
+CREATE DATABASE student_db;
+USE student_db;
+
+-- Creating the student table
+CREATE TABLE Student (
+    Student_id INT PRIMARY KEY,
+    Student_Name VARCHAR(255),
+    Class VARCHAR(50),
+    Address VARCHAR(255),
+    Grades VARCHAR(10),
+    Enrolment_details DATE
+);
+
+-- Creating the attendance table
+CREATE TABLE Attendance (
+    Student_id INT,
+    Subject_name VARCHAR(255),
+    Attendance INT
+);
+
+-- Creating a view for student performance and attendance
+CREATE VIEW StudentPerformance AS
+SELECT Student.Student_id, Student.Student_Name, Student.Class, Attendance.Subject_name, Student.Grades, Attendance.Attendance
+FROM Student
+JOIN Attendance ON Student.Student_id = Attendance.Student_id;
+
+-- Creating a sequence for generating unique student IDs
+CREATE SEQUENCE student_id_seq START WITH 1 INCREMENT BY 1;
+
+-- Creating an index on the student name
+CREATE INDEX idx_student_name ON Student (Student_Name);

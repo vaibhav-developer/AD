@@ -1,0 +1,44 @@
+
+
+
+6. Implement Greedy search algorithm for any of the following application:
+ • Single-Source Shortest Path Problem 
+• Job Scheduling Problem
+
+
+
+# Dijkstra's algorithm implementation without using libraries
+def dijkstra(graph, source):
+    distance = {node: float('inf') for node in graph}
+    distance[source] = 0
+    unvisited = {node for node in graph}
+
+    while unvisited:
+        current = min(unvisited, key=lambda node: distance[node])
+        unvisited.remove(current)
+
+        for neighbor in graph[current]:
+            new_distance = distance[current] + graph[current][neighbor]
+            if new_distance < distance[neighbor]:
+                distance[neighbor] = new_distance
+
+    return distance
+
+# Console-based usage
+graph = {}
+nodes = int(input("Enter the number of nodes in the graph: "))
+for i in range(nodes):
+    node = input(f"Enter the name of node {i + 1}: ")
+    connections = {}
+    edges = int(input(f"Enter the number of edges for node {node}: "))
+    for j in range(edges):
+        neighbor, weight = input(f"Enter the neighbor node and weight for edge {j + 1} (format: neighbor weight): ").split()
+        connections[neighbor] = int(weight)
+    graph[node] = connections
+
+source_node = input("Enter the source node: ")
+
+shortest_paths = dijkstra(graph, source_node)
+print(f"\nShortest paths from node {source_node}:")
+for node, dist in shortest_paths.items():
+    print(f"To {node} : {dist}")

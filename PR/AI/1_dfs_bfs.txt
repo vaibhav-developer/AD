@@ -1,0 +1,44 @@
+1. Implement depth first search algorithm and Breadth First Search algorithm. Use an undirected graph and develop a recursive algorithm for searching all the vertices of a graph or tree data structure.
+
+
+# Depth-First Search (DFS) algorithm
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    print(start, end=" ")
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            dfs(graph, neighbor, visited)
+
+# Breadth-First Search (BFS) algorithm
+def bfs(graph, start):
+    visited = set()
+    queue = [start]
+    visited.add(start)
+
+    while queue:
+        vertex = queue.pop(0)
+        print(vertex, end=" ")
+
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                queue.append(neighbor)
+                visited.add(neighbor)
+
+# Input-based graph creation
+graph = {}
+vertices = int(input("Enter the number of vertices in the graph: "))
+
+for i in range(vertices):
+    connections = list(map(int, input(f"Enter the vertices connected to vertex {i+1} (space-separated): ").split()))
+    graph[i+1] = connections
+
+start_vertex = int(input("Enter the starting vertex for traversal: "))
+
+# Execute DFS and BFS on the graph
+print("Depth-First Search (DFS):")
+dfs(graph, start_vertex)
+print("\nBreadth-First Search (BFS):")
+bfs(graph, start_vertex)

@@ -1,0 +1,75 @@
+
+
+2. Implement A star (A*) Algorithm for any game search problem.
+
+
+
+
+
+
+# Manhattan distance heuristic for A* algorithm
+def heuristic(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+# A* algorithm for finding the shortest path in a grid-based game
+def astar(start, goal, graph):
+    open_set = [start]
+    came_from = {}
+    cost_so_far = {start: 0}
+
+    while open_set:
+        current = open_set[0]
+        current_cost = cost_so_far[current]
+
+        if current == goal:
+            break
+
+        open_set.pop(0)
+
+        for next in graph[current]:
+            new_cost = current_cost + graph[current][next]
+            if next not in cost_so_far or new_cost < cost_so_far[next]:
+                cost_so_far[next] = new_cost
+                priority = new_cost + heuristic(goal, next)
+                open_set.append(next)
+                open_set.sort(key=lambda x: cost_so_far[x] + heuristic(goal, x))
+                came_from[next] = current
+
+    # Reconstructing the path
+    current = goal
+    path = [current]
+    while current != start:
+        current = came_from[current]
+        path.append(current)
+    path.reverse()
+    return path
+
+# Input-based grid creation
+graph = {}
+rows = int(input("Enter the number of rows in the grid: "))
+cols = int(input("Enter the number of columns in the grid: "))
+
+for i in range(rows):
+    for j in range(cols):
+        connections = {}
+        if j > 0:
+            connections[(i, j-1)] = 1
+        if j < cols-1:
+            connections[(i, j+1)] = 1
+        if i > 0:
+            connections[(i-1, j)] = 1
+        if i < rows-1:
+            connections[(i+1, j)] = 1
+        graph[(i, j)] = connections
+
+start_row = int(input("Enter the row of the starting point: "))
+start_col = int(input("Enter the column of the starting point: "))
+start = (start_row, start_col)
+
+goal_row = int(input("Enter the row of the goal point: "))
+goal_col = int(input("Enter the column of the goal point: "))
+goal = (goal_row, goal_col)
+
+# Finding the shortest path using A* algorithm
+path = astar(start, goal, graph)
+print("Shortest path:", path)

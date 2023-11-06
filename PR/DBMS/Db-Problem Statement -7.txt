@@ -1,0 +1,95 @@
+Problem Statement: -7
+Unnamed PL/SQLcode block: Use of Control structure and Exception handling is
+mandatory.
+Suggested Problem statement:
+Consider Tables:
+1. Borrower (Roll_no, Name, Date_of_Issue, Name_of_Book, Status)
+2. Fine (Roll_no, Date, Amt)
+● Accept Roll_no and Name_of_Book from user.
+● Check the number of days (from Date_of_Issue).
+● If days are between 15 to 30 then fine amount will be Rs 5per day.
+● If no. of days>30, per day fine will be Rs 50 per day and for days less than 30, Rs. 5 per
+day.
+● After submitting the book, status will change from I to R.
+● If condition of fine is true, then details will be stored into fine table.
+
+
+
+-- Creating the database and tables
+CREATE DATABASE library;
+
+USE library;
+
+CREATE TABLE Borrower (
+    Roll_no INT,
+    Name VARCHAR(255),
+    Date_of_Issue DATE,
+    Name_of_Book VARCHAR(255),
+    Status CHAR(1)
+);
+
+CREATE TABLE Fine (
+    Roll_no INT,
+    Date DATE,
+    Amt INT
+);
+
+-- Inserting dummy data
+INSERT INTO Borrower (Roll_no, Name, Date_of_Issue, Name_of_Book, Status)
+VALUES 
+    (1, 'Rahul', '2023-10-25', 'The Alchemist', 'I'),
+    (2, 'Sneha', '2023-09-15', 'The Da Vinci Code', 'I'),
+    (3, 'Amit', '2023-10-10', 'The Catcher in the Rye', 'I');
+
+
+-- PL/SQL Block for the problem statement
+DELIMITER //
+
+CREATE PROCEDURE processFine()
+BEGIN
+    DECLARE v_roll_no INT;
+    DECLARE v_name_of_book VARCHAR(255);
+    DECLARE v_date_of_issue DATE;
+    DECLARE v_days INT;
+    DECLARE v_fine_amt INT;
+    DECLARE v_status CHAR(1);
+
+    -- Accept Roll_no and Name_of_Book from user
+    SET v_roll_no = 1; -- Placeholder for Roll_no
+    SET v_name_of_book = 'The Alchemist'; -- Placeholder for Name_of_Book
+
+    -- Retrieve Date_of_Issue and Status from Borrower table based on Roll_no and Name_of_Book
+    SELECT Date_of_Issue, Status INTO v_date_of_issue, v_status
+    FROM Borrower
+    WHERE Roll_no = v_roll_no AND Name_of_Book = v_name_of_book;
+
+    -- Check the number of days from Date_of_Issue
+    SET v_days = DATEDIFF(CURDATE(), v_date_of_issue);
+
+    -- Calculate fine amount based on the number of days
+    IF v_days > 30 THEN
+        SET v_fine_amt = 50 * v_days;
+    ELSEIF v_days > 15 THEN
+        SET v_fine_amt = 5 * v_days;
+    ELSE
+        SET v_fine_amt = 0;
+    END IF;
+
+    -- Update the status in the Borrower table
+    IF v_status = 'I' THEN
+        UPDATE Borrower
+        SET Status = 'R'
+        WHERE Roll_no = v_roll_no AND Name_of_Book = v_name_of_book;
+    END IF;
+
+    -- Store the details into the Fine table if fine condition is true
+    IF v_fine_amt > 0 THEN
+        INSERT INTO Fine (Roll_no, Date, Amt) VALUES (v_roll_no, CURDATE(), v_fine_amt);
+        COMMIT;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Calling the procedure
+CALL processFine();

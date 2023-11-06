@@ -1,0 +1,42 @@
+Problem Statement: -6
+A retail company maintains a MongoDB collection named customer. Each document in this
+collection represents a purchase and contains fields such as cid (Customer ID), cname
+(Customer Name), amount (Amount spent on product purchase), and product_name (Product
+Name).
+Implement a MapReduce function in MongoDB to analyze the customer collection and
+produce a summarized report that displays the total amount spent by each customer on
+product purchases.
+
+
+// Connect to the MongoDB database
+mongosh
+
+// Switch to the appropriate database
+use your_database_name
+
+// Insert some sample data into the customer collection
+db.customer.insertMany([
+    { cid: 1, cname: "John Doe", amount: 100, product_name: "Product A" },
+    { cid: 2, cname: "Jane Smith", amount: 150, product_name: "Product B" },
+    { cid: 1, cname: "John Doe", amount: 200, product_name: "Product C" },
+    { cid: 3, cname: "Michael Johnson", amount: 300, product_name: "Product A" },
+    { cid: 2, cname: "Jane Smith", amount: 250, product_name: "Product A" }
+]);
+
+// Run the MapReduce operation
+var mapFunction = function() {
+    emit(this.cid, this.amount);
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+var result = db.customer.mapReduce(
+    mapFunction,
+    reduceFunction,
+    { out: { inline: 1 }, query: {} }
+);
+
+// Display the result
+printjson(result);

@@ -1,0 +1,69 @@
+Problem Statement:-3
+1. Write a PL/SQL block of code using parameterized Cursor that will merge the data available
+in the newly created table N_Roll_Call with the data available in the table O_Roll_Call. If the
+data in the first table already exists in the second table then that data should be skipped
+
+
+PROGRAM :
+
+
+-- Log in to MySQL
+mysql -u root -p
+
+-- Create a Database
+CREATE DATABASE my_database;
+
+-- Use the Database
+USE my_database;
+
+-- Create Tables
+CREATE TABLE N_Roll_Call (
+    roll_call_id INT PRIMARY KEY,
+    name VARCHAR(60),
+    marks INT 
+
+);
+
+CREATE TABLE O_Roll_Call (
+    roll_call_id INT PRIMARY KEY,
+    name VARCHAR(60),
+    marks INT 
+);
+
+-- Insert Data into a Table
+INSERT INTO N_Roll_Call (roll_call_id, name, marks) VALUES (1, 'Vaibhav', 99);
+
+-- PL/SQL Block for Merging Data
+DELIMITER //
+
+CREATE PROCEDURE merge_data()
+BEGIN
+    DECLARE v_count INT;
+    DECLARE v_roll_call_id INT;
+
+    DECLARE cur CURSOR FOR SELECT roll_call_id FROM N_Roll_Call;
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO v_roll_call_id;
+        IF v_roll_call_id IS NULL THEN
+            LEAVE read_loop;
+        END IF;
+
+        SELECT COUNT(*) INTO v_count FROM O_Roll_Call WHERE roll_call_id = v_roll_call_id;
+
+        IF v_count = 0 THEN
+            INSERT INTO O_Roll_Call (roll_call_id, name, marks) SELECT roll_call_id, name, marks FROM N_Roll_Call WHERE roll_call_id = v_roll_call_id;
+        END IF;
+    END LOOP;
+
+    CLOSE cur;
+END //
+
+DELIMITER ;
+
+-- Call the Procedure
+CALL merge_data();
+
+-- Exit MySQL
+exit;

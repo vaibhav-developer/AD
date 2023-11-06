@@ -1,0 +1,127 @@
+Problem Statement: -5
+
+MongoDB Aggregation
+You have been given a dataset containing details about different books. Each book has the
+following fields:
+● title: The title of the book
+● author: The author of the book
+● genre: The genre of the book (e.g., Fiction, Non-Fiction, Mystery, Sci-Fi)
+● price: The price of the book
+● published_date: The date the book was published.
+The data has been stored in a MongoDB collection named books.
+Using the MongoDB aggregation framework, perform the following tasks:
+1. Find the average price of all books.
+2. Find the count of books in each genre.
+3. For each genre, find the most expensive book.
+4. Find the authors who have written maximum books.
+5. Sort the books by published_date in descending order.
+6. Sort the price in ascending order.
+7. create an index on title of the book and describe the index details
+
+
+// Insert some demo data
+db.books.insertMany([
+    {
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+        genre: "Fiction",
+        price: 25.5,
+        published_date: ISODate("2020-05-01")
+    },
+    {
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+        genre: "Fiction",
+        price: 30.2,
+        published_date: ISODate("2018-10-12")
+    },
+    {
+        title: "1984",
+        author: "George Orwell",
+        genre: "Sci-Fi",
+        price: 20.8,
+        published_date: ISODate("2019-02-15")
+    },
+    {
+        title: "The Catcher in the Rye",
+        author: "J.D. Salinger",
+        genre: "Fiction",
+        price: 28.0,
+        published_date: ISODate("2021-01-05")
+    },
+    {
+        title: "Sapiens: A Brief History of Humankind",
+        author: "Yuval Noah Harari",
+        genre: "Non-Fiction",
+        price: 22.9,
+        published_date: ISODate("2017-09-30")
+    }
+]);
+
+
+
+// Find the average price of all books
+db.books.aggregate([
+    {
+        $group: {
+            _id: null,
+            averagePrice: { $avg: "$price" }
+        }
+    }
+]);
+
+
+
+// Find the count of books in each genre
+db.books.aggregate([
+    {
+        $group: {
+            _id: "$genre",
+            count: { $sum: 1 }
+        }
+    }
+]);
+
+
+
+// For each genre, find the most expensive book
+db.books.aggregate([
+    {
+        $group: {
+            _id: "$genre",
+            maxPrice: { $max: "$price" },
+            book: { $first: "$$ROOT" }
+        }
+    }
+]);
+
+
+
+// Find the authors who have written the maximum number of books
+db.books.aggregate([
+    {
+        $group: {
+            _id: "$author",
+            count: { $sum: 1 }
+        }
+    },
+    {
+        $sort: { count: -1 }
+    },
+    {
+        $limit: 1
+    }
+]);
+
+
+
+// Sort the books by published_date in descending order
+db.books.find().sort({ published_date: -1 });
+
+
+// Sort the price in ascending order
+db.books.find().sort({ price: 1 });
+
+// Create an index on the title of the book and describe the index details
+db.books.createIndex({ title: 1 });
+db.books.getIndexes();

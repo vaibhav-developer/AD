@@ -1,0 +1,42 @@
+
+
+7. Implement Greedy search algorithm for any of the following application:
+ • Prim's Minimal Spanning Tree Algorithm
+
+# Greedy algorithm for finding minimum spanning tree using Prim's algorithm
+def prim_mst(graph, start):
+    mst = []
+    visited = set([start])
+    edges = [
+        (cost, start, end)
+        for end, cost in graph[start].items()
+    ]
+    edges.sort()
+
+    while edges:
+        cost, start, end = edges.pop(0)
+        if end not in visited:
+            visited.add(end)
+            mst.append((start, end, cost))
+
+            for new_end, new_cost in graph[end].items():
+                if new_end not in visited:
+                    edges.append((new_cost, end, new_end))
+            edges.sort()
+
+    return mst
+
+# Example usage
+graph = {
+    'A': {'B': 6, 'C': 2},
+    'B': {'A': 6, 'C': 3, 'D': 1},
+    'C': {'A': 2, 'B': 3, 'D': 5},
+    'D': {'B': 1, 'C': 5}
+}
+start_vertex = 'A'
+
+mst = prim_mst(graph, start_vertex)
+print("Minimum Spanning Tree:")
+for edge in mst:
+    start, end, cost = edge
+    print(f"Edge: {start} - {end} \tCost: {cost}")

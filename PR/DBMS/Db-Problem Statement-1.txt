@@ -1,0 +1,182 @@
+Problem Statement:-1
+Account(Acc_no, branch_name,balance)
+branch(branch_name,branch_city,assets_amt)
+customer(cust_name,cust_street,cust_city)
+Depositor(cust_name,acc_no)
+Loan(Acc_no,loan_no,branch_name,amount)
+Borrower(cust_name,loan_no)
+Solve following query:
+1. Create above tables with appropriate constraints like primary key, foreign key,
+check constrains, not null etc.
+2. Find the names of all branches in loan relation.
+3. Find all loan numbers for loans made at Pimpri Branch with loan amount > 12000.
+4. Find all customers who have a loan from bank. Find their names, loan_no and loan
+amount.
+5. List all customers in alphabetical order who have loan from Akurdi branch.
+6. Find all customers who have an account or loan or both at bank.
+7. Find all customers who have both account and loan at bank.
+8. Find average account balance at Pimpri branch.
+9. Find the average account balance at each branch
+10. Find the branches where average account balance > 12000.
+11. Calculate total loan amount given by bank.
+
+
+#CODE
+
+CREATE TABLE Account (
+    Acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    balance DECIMAL(10, 2),
+    FOREIGN KEY (branch_name) REFERENCES branch(branch_name)
+);
+
+CREATE TABLE Branch (
+    branch_name VARCHAR(255) PRIMARY KEY,
+    branch_city VARCHAR(255),
+    assets_amt DECIMAL(10, 2)
+);
+
+CREATE TABLE Customer (
+    cust_name VARCHAR(255) PRIMARY KEY,
+    cust_street VARCHAR(255),
+    cust_city VARCHAR(255)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(255),
+    acc_no INT,
+    FOREIGN KEY (cust_name) REFERENCES customer(cust_name),
+    FOREIGN KEY (acc_no) REFERENCES account(Acc_no)
+);
+
+CREATE TABLE Loan (
+    Acc_no INT,
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    amount DECIMAL(10, 2),
+    FOREIGN KEY (Acc_no) REFERENCES account(Acc_no),
+    FOREIGN KEY (branch_name) REFERENCES branch(branch_name)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(255),
+    loan_no INT,
+    FOREIGN KEY (cust_name) REFERENCES customer(cust_name),
+    FOREIGN KEY (loan_no) REFERENCES loan(loan_no)
+);
+
+
+
+-- Inserting dummy data into the Branch table
+INSERT INTO Branch (branch_name, branch_city, assets_amt) VALUES
+('Pimpri', 'Pune', 200000),
+('Akurdi', 'Pune', 150000),
+('Chinchwad', 'Pune', 180000);
+
+-- Inserting dummy data into the Account table
+INSERT INTO Account (Acc_no, branch_name, balance) VALUES
+(101, 'Pimpri', 15000),
+(102, 'Akurdi', 20000),
+(103, 'Chinchwad', 18000),
+(104, 'Pimpri', 22000),
+(105, 'Pimpri', 13000);
+
+-- Inserting dummy data into the Customer table
+INSERT INTO Customer (cust_name, cust_street, cust_city) VALUES
+('John Doe', '123 Main St', 'Pune'),
+('Jane Smith', '456 Oak Ave', 'Pune'),
+('Michael Johnson', '789 Maple Ln', 'Pune');
+
+-- Inserting dummy data into the Depositor table
+INSERT INTO Depositor (cust_name, acc_no) VALUES
+('John Doe', 101),
+('Jane Smith', 102),
+('Michael Johnson', 103),
+('John Doe', 104);
+
+-- Inserting dummy data into the Loan table
+INSERT INTO Loan (Acc_no, loan_no, branch_name, amount) VALUES
+(101, 201, 'Pimpri', 15000),
+(102, 202, 'Akurdi', 18000),
+(103, 203, 'Chinchwad', 25000),
+(104, 204, 'Pimpri', 20000);
+
+-- Inserting dummy data into the Borrower table
+INSERT INTO Borrower (cust_name, loan_no) VALUES
+('John Doe', 201),
+('Jane Smith', 202),
+('Michael Johnson', 203),
+('John Doe', 204);
+
+--1
+Find the names of all branches in the loan relation.
+SELECT DISTINCT branch_name FROM Loan;
+
+--2
+Find all loan numbers for loans made at Pimpri Branch with loan amount > 12000.
+SELECT loan_no FROM Loan WHERE branch_name = 'Pimpri' AND amount > 12000;
+
+--3
+Find all customers who have a loan from the bank. Find their names, loan_no, and loan amount.
+SELECT c.cust_name, l.loan_no, l.amount 
+FROM Customer c 
+JOIN Borrower b ON c.cust_name = b.cust_name 
+JOIN Loan l ON b.loan_no = l.loan_no;
+
+--4
+List all customers in alphabetical order who have a loan from the Akurdi branch.
+SELECT c.cust_name 
+FROM Customer c 
+JOIN Borrower b ON c.cust_name = b.cust_name 
+JOIN Loan l ON b.loan_no = l.loan_no 
+WHERE l.branch_name = 'Akurdi' 
+ORDER BY c.cust_name;
+
+--5
+Find all customers who have an account or loan or both at the bank.
+SELECT DISTINCT cust_name 
+FROM (
+    SELECT cust_name FROM Depositor 
+    UNION 
+    SELECT cust_name FROM Borrower
+) AS customer_union;
+
+--6
+Find all customers who have both account and loan at the bank.
+SELECT d.cust_name 
+FROM Depositor d 
+INNER JOIN Borrower b ON d.cust_name = b.cust_name;
+
+--7
+Find the average account balance at the Pimpri branch.
+SELECT AVG(balance) 
+FROM Account 
+WHERE branch_name = 'Pimpri';
+
+--8
+Find the average account balance at each branch.
+SELECT branch_name, AVG(balance) 
+FROM Account 
+GROUP BY branch_name;
+
+--9
+Find the branches where the average account balance is greater than 12000.
+SELECT branch_name 
+FROM Account 
+GROUP BY branch_name 
+HAVING AVG(balance) > 12000;
+
+--10
+Calculate the total loan amount given by the bank.
+SELECT SUM(amount) 
+FROM Loan;
+
+
+
+
+
+
+
+
+
+
